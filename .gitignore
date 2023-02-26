@@ -1,0 +1,4 @@
+.DS_Store
+**/*.pyc
+icbot/settings.py
+data/
