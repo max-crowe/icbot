@@ -1,5 +1,6 @@
 import smtplib
 from email.message import EmailMessage
+from logging.handlers import SMTPHandler
 from typing import Optional
 
 from icbot.config import settings
@@ -12,7 +13,8 @@ class SMTPConnectionWrapper:
         host: Optional[str] = None,
         port: Optional[int] = None,
         username: Optional[str] = None,
-        password: Optional[str] = None
+        password: Optional[str] = None,
+        use_ssl = True
     ):
         self.host = host or settings.SMTP_HOST
         self.port = port or settings.SMTP_PORT
@@ -27,7 +29,8 @@ class SMTPConnectionWrapper:
     def open(self):
         if self.connection:
             return
-        self.connection = smtplib.SMTP(self.host, self.port)
+        connection_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
+        self.connection = connection_class(self.host, self.port)
         if self.username:
             self.connection.login(self.username, self.password)
 
@@ -56,3 +59,19 @@ class SMTPConnectionWrapper:
         message["From"] = from_addr or settings.EMAIL_FROM_ADDRESS
         message["To"] = ", ".join(to_addrs)
         self.send_email(message)
+
+
+class SMTPSSLHandler(SMTPHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.connection_wrapper = SMTPConnectionWrapper()
+
+    def emit(self, record):
+        try:
+            self.connection_wrapper.make_and_send_email(
+                self.toaddrs,
+                self.getSubject(record),
+                self.format(record)
+            )
+        except Exception:
+            self.handleError(record)
