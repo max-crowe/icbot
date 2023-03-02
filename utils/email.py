@@ -17,6 +17,7 @@ class SMTPConnectionWrapper:
         self.port = port
         self.username = username
         self.password = password
+        self.use_ssl = use_ssl
         self.from_address = None
         self.connection = None
 
@@ -30,7 +31,7 @@ class SMTPConnectionWrapper:
         if self.connection:
             return
         self.from_address = settings.EMAIL_FROM_ADDRESS
-        connection_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
+        connection_class = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
         self.connection = connection_class(
             self.host or settings.SMTP_HOST,
             self.port or settings.SMTP_PORT
