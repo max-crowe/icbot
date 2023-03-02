@@ -190,7 +190,6 @@ class ScraperTestCase(IsolatedAsyncioTestCase):
         )
         mock_session.return_value.get.return_value.__aenter__.side_effect = mock_responses
         dt = date(2023, 2, 15)
-        scraper = Scraper()
         with settings.override({
             "BLOCKING_FILTERS": {
                 "ACTIVITIES": ["UX"],
@@ -199,7 +198,7 @@ class ScraperTestCase(IsolatedAsyncioTestCase):
             },
             "POLICE_LOG_URL": "http://test/police/log"
         }):
-            entry_set = await fetch_dispatch_entries(scraper, dt)
+            entry_set = await fetch_dispatch_entries(dt)
         self.assertEqual(entry_set.date, dt)
         self.assertEqual(len(entry_set.entries), 2)
         self.assertEqual(entry_set.entries[0].dispatch_number, 123)
@@ -244,7 +243,7 @@ class ScraperTestCase(IsolatedAsyncioTestCase):
             },
             "POLICE_LOG_URL": "http://test/police/log"
         }):
-            entry_set = await fetch_dispatch_entries(scraper, dt, [123, 789])
+            entry_set = await fetch_dispatch_entries(dt, [123, 789])
         self.assertEqual(len(entry_set.entries), 1)
         self.assertEqual(entry_set.entries[0], BlotterEntry(
             dispatch_number=4567,

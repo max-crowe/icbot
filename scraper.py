@@ -77,10 +77,12 @@ class Scraper:
 
 
 async def fetch_dispatch_entries(
-    scraper: Scraper,
     for_date: date,
-    skip_ids: Optional[list[int]] = None
+    skip_ids: Optional[list[int]] = None,
+    scraper: Optional[Scraper] = None
 ) -> DispatchEntrySet:
+    if scraper is None:
+        scraper = Scraper()
     async with scraper.session() as session:
         blotter_page = BeautifulSoup(await scraper.fetch_one(
             session,
@@ -138,6 +140,6 @@ async def fetch_dispatch_entries_for_date_range(
     entry_sets: list[DispatchEntrySet] = []
     async with scraper.session() as session:
         while from_date <= through_date:
-            entry_sets.append(await fetch_dispatch_entries(scraper, from_date, skip_ids))
+            entry_sets.append(await fetch_dispatch_entries(from_date, skip_ids, scraper))
             from_date += timedelta(days=1)
     return entry_sets
