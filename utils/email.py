@@ -21,8 +21,7 @@ class SMTPConnectionWrapper:
         self.connection = None
 
     def open(self):
-        from icbot.config import settings
-        from icbot.settings import ConfigurationError
+        from icbot.config import settings, ConfigurationError
 
         if not self.host and not settings.SMTP_HOST:
             raise ConfigurationError(
