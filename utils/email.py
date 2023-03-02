@@ -17,6 +17,7 @@ class SMTPConnectionWrapper:
         self.port = port
         self.username = username
         self.password = password
+        self.from_address = None
         self.connection = None
 
     def open(self):
@@ -29,6 +30,7 @@ class SMTPConnectionWrapper:
             )
         if self.connection:
             return
+        self.from_address = settings.EMAIL_FROM_ADDRESS
         connection_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
         self.connection = connection_class(
             self.host or settings.SMTP_HOST,
@@ -62,7 +64,7 @@ class SMTPConnectionWrapper:
         message = EmailMessage()
         message.set_content(body)
         message["Subject"] = subject
-        message["From"] = from_addr or settings.EMAIL_FROM_ADDRESS
+        message["From"] = from_addr or self.from_address
         message["To"] = ", ".join(to_addrs)
         self.send_email(message)
 
