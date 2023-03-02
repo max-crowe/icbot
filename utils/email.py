@@ -3,7 +3,6 @@ from email.message import EmailMessage
 from logging.handlers import SMTPHandler
 from typing import Optional
 
-from icbot.config import settings
 from icbot.settings import ConfigurationError
 
 
@@ -23,6 +22,7 @@ class SMTPConnectionWrapper:
         self.connection = None
 
     def open(self):
+        from icbot.config import settings
         if not self.host and not settings.SMTP_HOST:
             raise ConfigurationError(
                 "No SMTP hostname provided (did you forget to set the SMTP_HOST setting?)"
