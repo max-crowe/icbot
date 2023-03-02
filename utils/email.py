@@ -16,23 +16,29 @@ class SMTPConnectionWrapper:
         password: Optional[str] = None,
         use_ssl = True
     ):
-        self.host = host or settings.SMTP_HOST
-        self.port = port or settings.SMTP_PORT
-        self.username = username or settings.SMTP_USERNAME
-        self.password = password or settings.SMTP_PASSWORD
-        if not self.host:
-            raise ConfigurationError(
-                "No SMTP hostname provided (did you forget to set the SMTP_HOST setting?)"
-            )
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
         self.connection = None
 
     def open(self):
+        if not self.host and not settings.SMTP_HOST:
+            raise ConfigurationError(
+                "No SMTP hostname provided (did you forget to set the SMTP_HOST setting?)"
+            )
         if self.connection:
             return
         connection_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
-        self.connection = connection_class(self.host, self.port)
+        self.connection = connection_class(
+            self.host or settings.SMTP_HOST,
+            self.port or settings.SMTP_PORT
+        )
         if self.username:
-            self.connection.login(self.username, self.password)
+            self.connection.login(
+                self.username or settings.SMTP_USERNAME,
+                self.password or settings.SMTP_PASSWORD
+            )
 
     def close(self):
         if self.connection:
