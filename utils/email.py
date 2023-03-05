@@ -36,11 +36,10 @@ class SMTPConnectionWrapper:
             self.host or settings.SMTP_HOST,
             self.port or settings.SMTP_PORT
         )
-        if self.username:
-            self.connection.login(
-                self.username or settings.SMTP_USERNAME,
-                self.password or settings.SMTP_PASSWORD
-            )
+        username = self.username or settings.SMTP_USERNAME
+        password = self.password or settings.SMTP_PASSWORD
+        if username is not None and password is not None:
+            self.connection.login(username, password)
 
     def close(self):
         if self.connection:

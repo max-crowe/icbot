@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 
 from icbot.config import settings
@@ -17,6 +17,16 @@ logger = logging.getLogger(__name__)
 
 class UnexpectedContentsError(RuntimeError):
     pass
+
+
+class RemoteServerFlow(Flow):
+    def run(self):
+        self.redirect_uri = "http://localhost"
+        auth_url, _ = self.authorization_url()
+        print(f"Please visit the following URL: {auth_url}")
+        redirect_url = input("After logging in, please enter the redirect URL: ")
+        self.fetch_token(authorization_response=redirect_url.replace("http:", "https:"))
+        return self.credentials
 
 
 class GoogleSheetsStorage(BaseStorage):
@@ -73,10 +83,10 @@ class GoogleSheetsStorage(BaseStorage):
             else:
                 creds = None
         if creds is None:
-            flow = InstalledAppFlow.from_client_secrets_file(
+            flow = RemoteServerFlow.from_client_secrets_file(
                 self.client_secrets_file, self.scopes
             )
-            creds = flow.run_local_server(port=0)
+            creds = flow.run()
             with cached_token_file.open("w") as f:
                 f.write(creds.to_json())
         return build("sheets", "v4", credentials=creds)
