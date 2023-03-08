@@ -15,6 +15,10 @@ from .base import BaseStorage
 logger = logging.getLogger(__name__)
 
 
+class ManualAuthorizationRequiredError(RuntimeError):
+    pass
+
+
 class UnexpectedContentsError(RuntimeError):
     pass
 
@@ -83,6 +87,10 @@ class GoogleSheetsStorage(BaseStorage):
             else:
                 creds = None
         if creds is None:
+            if not self.interactive:
+                raise ManualAuthorizationRequiredError(
+                    "No cached credentials were available; please run manually and reauthorize"
+                );
             flow = RemoteServerFlow.from_client_secrets_file(
                 self.client_secrets_file, self.scopes
             )

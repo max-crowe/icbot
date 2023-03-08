@@ -7,8 +7,7 @@ from logging.config import dictConfig
 from pathlib import Path
 from typing import Any, TYPE_CHECKING, Union
 
-if TYPE_CHECKING:
-    from storage.base import BaseStorage
+from storage.base import BaseStorage, get_concrete_storage
 
 
 class ConfigurationError(ValueError):
@@ -88,11 +87,9 @@ class Settings:
         finally:
             self._set_from_dict(prev)
 
-    @cached_property
-    def storage(self) -> "BaseStorage":
-        module_path, _, class_name = self.STORAGE["class"].rpartition('.')
-        return getattr(import_module(module_path), class_name)(
-            **self.STORAGE["init_kwargs"]
+    def get_storage(self, interactive=True) -> "BaseStorage":
+        return get_concrete_storage(
+            interactive, self.STORAGE["class"], **self.STORAGE["init_kwargs"]
         )
 
 
