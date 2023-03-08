@@ -21,7 +21,7 @@ class BaseStorage(ABC):
 
 
 def get_concrete_storage(interactive, class_path, **init_kwargs) -> BaseStorage:
-    module_path, _, class_name = class_path.partition(".")
+    module_path, _, class_name = class_path.rpartition(".")
     storage = getattr(import_module(module_path), class_name)(**init_kwargs)
     storage.interactive = interactive
     return storage
