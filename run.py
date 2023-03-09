@@ -19,6 +19,8 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--noninteractive", action="store_true")
     args = parser.parse_args()
+    if args.noninteractive:
+        settings.disable_logging_stream_handler()
     try:
         storage = settings.get_storage(not args.noninteractive)
         fill_through_current_date(storage)

@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from functools import cached_property
 from importlib import import_module
+from logging import getLogger, StreamHandler
 from logging.config import dictConfig
 from pathlib import Path
 from typing import Any, TYPE_CHECKING, Union
@@ -91,6 +92,15 @@ class Settings:
         return get_concrete_storage(
             interactive, self.STORAGE["class"], **self.STORAGE["init_kwargs"]
         )
+
+    @staticmethod
+    def disable_logging_stream_handler():
+        logger = getLogger('')
+        for handler in filter(
+            lambda handler: isinstance(handler, StreamHandler),
+            logger.handlers
+        ):
+            logger.removeHandler(handler)
 
 
 settings = Settings("icbot.settings")
