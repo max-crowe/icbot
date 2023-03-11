@@ -3,6 +3,7 @@ from datetime import date, datetime
 from functools import cached_property
 from typing import Any, Optional
 
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
@@ -83,7 +84,10 @@ class GoogleSheetsStorage(BaseStorage):
         if cached_token_file.exists():
             creds = Credentials.from_authorized_user_file(cached_token_file, self.scopes)
             if creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+                try:
+                    creds.refresh(Request())
+                except RefreshError:
+                    creds = None
             else:
                 creds = None
         if creds is None:

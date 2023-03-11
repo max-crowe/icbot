@@ -70,15 +70,25 @@ class SMTPConnectionWrapper:
 
 class SMTPSSLHandler(SMTPHandler):
     def __init__(self, *args, **kwargs):
+        self.retries = kwargs.pop("retries", 1)
         super().__init__(*args, **kwargs)
-        self.connection_wrapper = SMTPConnectionWrapper()
+        self.connection_wrapper = SMTPConnectionWrapper(
+            self.mailhost,
+            self.mailport,
+            self.username,
+            self.password
+        )
 
     def emit(self, record):
-        try:
-            self.connection_wrapper.make_and_send_email(
-                self.toaddrs,
-                self.getSubject(record),
-                self.format(record)
-            )
-        except Exception:
-            self.handleError(record)
+        for i in range(self.retries):
+            try:
+                self.connection_wrapper.make_and_send_email(
+                    self.toaddrs,
+                    self.getSubject(record),
+                    self.format(record)
+                )
+            except Exception:
+                if i + 1 < self.retries:
+                    continue
+                self.handleError(record)
+            break
