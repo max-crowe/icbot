@@ -1,7 +1,7 @@
 import asyncio, logging
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any, Iterator, Optional, Union
 
 from aiohttp import ClientSession
@@ -135,7 +135,7 @@ async def fetch_dispatch_entries_for_date_range(
     skip_ids: Optional[list[int]] = None
 ) -> list[DispatchEntrySet]:
     if through_date is None:
-        through_date = date.today()
+        through_date = datetime.now(tz=settings.timezone).date()
     scraper = Scraper()
     entry_sets: list[DispatchEntrySet] = []
     async with scraper.session() as session:

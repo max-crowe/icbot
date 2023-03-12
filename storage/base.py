@@ -19,6 +19,9 @@ class BaseStorage(ABC):
     def store_entries(self, entry_set: "DispatchEntrySet"):
         ...
 
+    def prune(self):
+        pass
+
 
 def get_concrete_storage(interactive, class_path, **init_kwargs) -> BaseStorage:
     module_path, _, class_name = class_path.rpartition(".")

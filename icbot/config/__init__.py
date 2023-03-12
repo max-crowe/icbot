@@ -6,7 +6,8 @@ from importlib import import_module
 from logging import getLogger, StreamHandler
 from logging.config import dictConfig
 from pathlib import Path
-from typing import Any, TYPE_CHECKING, Union
+from typing import Any, Union
+from zoneinfo import ZoneInfo
 
 from storage.base import BaseStorage, get_concrete_storage
 
@@ -101,6 +102,10 @@ class Settings:
             logger.handlers
         ):
             logger.removeHandler(handler)
+
+    @cached_property
+    def timezone(self) -> ZoneInfo:
+        return ZoneInfo(self.TIME_ZONE)
 
 
 settings = Settings("icbot.settings")

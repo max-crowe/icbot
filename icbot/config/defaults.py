@@ -1,6 +1,7 @@
 from pathlib import Path
 
 
+TIME_ZONE = "America/Chicago"
 POLICE_LOG_URL = "https://www.iowa-city.org/IcgovApps/police/ActivityLog"
 POLICE_LOG_DATETIME_FORMAT = "%-m/%-d/%Y"
 BLOCKING_FILTERS = {
