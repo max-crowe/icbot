@@ -15,7 +15,7 @@ def fill_through_date(through_date: date, storage: BaseStorage):
         return
     entry_sets = asyncio.run(fetch_dispatch_entries_for_date_range(
         latest_date,
-        through_date
+        through_date,
         skip_ids=id_list
     ))
     for entry_set in entry_sets:
