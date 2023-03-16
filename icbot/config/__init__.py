@@ -1,6 +1,7 @@
 import re
 from contextlib import contextmanager
 from copy import deepcopy
+from datetime import date, datetime
 from functools import cached_property
 from importlib import import_module
 from logging import getLogger, StreamHandler
@@ -106,6 +107,10 @@ class Settings:
     @cached_property
     def timezone(self) -> ZoneInfo:
         return ZoneInfo(self.TIME_ZONE)
+
+    @property
+    def current_date(self) -> date:
+        return datetime.now(tz=self.timezone).date()
 
 
 settings = Settings("icbot.settings")
