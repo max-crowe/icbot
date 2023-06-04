@@ -83,13 +83,14 @@ class GoogleSheetsStorage(BaseStorage):
         creds = None
         if cached_token_file.exists():
             creds = Credentials.from_authorized_user_file(cached_token_file, self.scopes)
-            if creds.expired and creds.refresh_token:
-                try:
-                    creds.refresh(Request())
-                except RefreshError:
+            if creds.expired:
+                if creds.refresh_token:
+                    try:
+                        creds.refresh(Request())
+                    except RefreshError:
+                        creds = None
+                else:
                     creds = None
-            else:
-                creds = None
         if creds is None:
             if not self.interactive:
                 raise ManualAuthorizationRequiredError(
